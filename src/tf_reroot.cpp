@@ -88,14 +88,8 @@ private:
             "Frame that will become the parent of child_frame in the main TF "
             "tree.  Typically already present in the main TF tree.").declare();
 
-        params_->param(&source_tf_topic_, "source_tf_topic", std::string(""),
-            "TF topic carrying the source transforms (usually /tf remapped to a "
-            "private topic to prevent those transforms from entering the main "
-            "tree directly).").declare();
-
-        if (child_frame_.empty() || parent_frame_.empty() || source_tf_topic_.empty()) {
-            RCLCPP_ERROR(get_logger(),
-                "child_frame, parent_frame, and source_tf_topic must all be set.");
+        if (child_frame_.empty() || parent_frame_.empty()) {
+            RCLCPP_ERROR(get_logger(), "child_frame and parent_frame must both be set.");
             return;
         }
 
@@ -110,13 +104,12 @@ private:
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this);
 
         sub_tf_ = create_subscription<tf2_msgs::msg::TFMessage>(
-            source_tf_topic_, rclcpp::QoS(100),
+            "tf_source", rclcpp::QoS(100),
             std::bind(&TfReroot::onSourceTf, this, std::placeholders::_1));
 
         RCLCPP_INFO(get_logger(),
-            "Broadcasting '%s' -> '%s' (source topic: '%s'). "
-            "Pivot frame will be detected automatically.",
-            parent_frame_.c_str(), child_frame_.c_str(), source_tf_topic_.c_str());
+            "Broadcasting '%s' -> '%s'. Pivot frame will be detected automatically.",
+            parent_frame_.c_str(), child_frame_.c_str());
     }
 
     void onSourceTf(const tf2_msgs::msg::TFMessage::SharedPtr msg) {
@@ -286,7 +279,6 @@ private:
 
     std::string child_frame_;
     std::string parent_frame_;
-    std::string source_tf_topic_;
     std::string pivot_frame_;       // detected at runtime; empty until found
     bool        child_in_source_;   // set by detectPivot
     bool        parent_in_main_;    // set by detectPivot

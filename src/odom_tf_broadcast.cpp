@@ -83,9 +83,6 @@ private:
         params_ = std::make_shared<hatchbed_common::ParamHandler>(shared_from_this());
         params_->register_verbose_logging_param();
 
-        params_->param(&odom_topic_, "odom_topic", std::string(""),
-            "Odometry topic to subscribe to.").declare();
-
         params_->param(&child_frame_, "child_frame", std::string(""),
             "Frame to broadcast as a child of parent_frame.  Must match either "
             "header.frame_id or child_frame_id of the odometry message.").declare();
@@ -100,9 +97,8 @@ private:
             "between low-frequency updates (e.g. set to 1.5x the odometry period)."
             ).min(-1.0).max(10.0).dynamic().declare();
 
-        if (odom_topic_.empty() || child_frame_.empty() || parent_frame_.empty()) {
-            RCLCPP_ERROR(get_logger(),
-                "odom_topic, child_frame, and parent_frame must all be set.");
+        if (child_frame_.empty() || parent_frame_.empty()) {
+            RCLCPP_ERROR(get_logger(), "child_frame and parent_frame must both be set.");
             return;
         }
 
@@ -111,12 +107,12 @@ private:
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this);
 
         sub_odom_ = create_subscription<nav_msgs::msg::Odometry>(
-            odom_topic_, rclcpp::QoS(10),
+            "odom", rclcpp::QoS(10),
             std::bind(&OdomTfBroadcast::onOdom, this, std::placeholders::_1));
 
         RCLCPP_INFO(get_logger(),
-            "Broadcasting '%s' -> '%s' from odometry topic '%s'.",
-            parent_frame_.c_str(), child_frame_.c_str(), odom_topic_.c_str());
+            "Broadcasting '%s' -> '%s' from odometry.",
+            parent_frame_.c_str(), child_frame_.c_str());
     }
 
     void onOdom(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -219,7 +215,6 @@ private:
     std::shared_ptr<tf2_ros::TransformListener>              tf_listener_;
     std::unique_ptr<tf2_ros::TransformBroadcaster>           tf_broadcaster_;
 
-    std::string odom_topic_;
     std::string child_frame_;
     std::string parent_frame_;
     double      timestamp_offset_ = 0.0;

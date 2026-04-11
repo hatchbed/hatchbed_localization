@@ -72,28 +72,20 @@ private:
         params_ = std::make_shared<hatchbed_common::ParamHandler>(shared_from_this());
         params_->register_verbose_logging_param();
 
-        params_->param(&imu_topic_, "imu_topic", std::string(""),
-            "IMU topic to subscribe to.").declare();
-
         params_->param(&differential_, "differential", false,
             "Derive angular velocity from the differential of the orientation rather "
             "than reading angular_velocity directly.  Requires the orientation field "
             "to be populated.").declare();
 
-        if (imu_topic_.empty()) {
-            RCLCPP_ERROR(get_logger(), "imu_topic must be set.");
-            return;
-        }
-
         pub_twist_ = create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(
             "twist", rclcpp::QoS(10));
 
         sub_imu_ = create_subscription<sensor_msgs::msg::Imu>(
-            imu_topic_, rclcpp::QoS(10),
+            "imu", rclcpp::QoS(10),
             std::bind(&ImuToTwist::onImu, this, std::placeholders::_1));
 
-        RCLCPP_INFO(get_logger(), "Converting IMU '%s' to twist (%s mode).",
-            imu_topic_.c_str(), differential_ ? "differential" : "direct");
+        RCLCPP_INFO(get_logger(), "Converting IMU to twist (%s mode).",
+            differential_ ? "differential" : "direct");
     }
 
     void onImu(const sensor_msgs::msg::Imu::SharedPtr msg) {
@@ -174,7 +166,6 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr                       sub_imu_;
     rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr pub_twist_;
 
-    std::string     imu_topic_;
     bool            differential_ = false;
 
     // Differential mode state.

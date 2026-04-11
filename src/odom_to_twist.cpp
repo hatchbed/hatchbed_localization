@@ -74,9 +74,6 @@ private:
         params_ = std::make_shared<hatchbed_common::ParamHandler>(shared_from_this());
         params_->register_verbose_logging_param();
 
-        params_->param(&odom_topic_, "odom_topic", std::string(""),
-            "Odometry topic to subscribe to.").declare();
-
         params_->param(&frame_id_, "frame_id", std::string(""),
             "Override the output header frame_id.  If empty, the odometry header "
             "frame_id is used unchanged.").declare();
@@ -85,20 +82,15 @@ private:
             "Derive twist from the differential of the pose rather than reading the "
             "twist field directly.").declare();
 
-        if (odom_topic_.empty()) {
-            RCLCPP_ERROR(get_logger(), "odom_topic must be set.");
-            return;
-        }
-
         pub_twist_ = create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(
             "twist", rclcpp::QoS(10));
 
         sub_odom_ = create_subscription<nav_msgs::msg::Odometry>(
-            odom_topic_, rclcpp::QoS(10),
+            "odom", rclcpp::QoS(10),
             std::bind(&OdomToTwist::onOdom, this, std::placeholders::_1));
 
-        RCLCPP_INFO(get_logger(), "Converting odometry '%s' to twist (%s mode).",
-            odom_topic_.c_str(), differential_ ? "differential" : "direct");
+        RCLCPP_INFO(get_logger(), "Converting odometry to twist (%s mode).",
+            differential_ ? "differential" : "direct");
     }
 
     void onOdom(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -186,7 +178,6 @@ private:
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr                     sub_odom_;
     rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr pub_twist_;
 
-    std::string    odom_topic_;
     std::string    frame_id_;
     bool           differential_ = false;
 

@@ -20,7 +20,7 @@ orientation quaternions.  The orientation field must be populated
 
 | Topic | Type | Description |
 |---|---|---|
-| *(imu_topic)* | `sensor_msgs/Imu` | Input IMU messages |
+| `imu` | `sensor_msgs/Imu` | Input IMU messages (remap to the desired topic) |
 
 **Publications**
 
@@ -32,7 +32,6 @@ orientation quaternions.  The orientation field must be populated
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `imu_topic` | string | *required* | IMU topic to subscribe to |
 | `differential` | bool | `false` | Derive angular velocity from orientation differential rather than reading angular_velocity directly |
 
 ---
@@ -51,7 +50,7 @@ twist is derived by finite-differencing consecutive poses, with covariance propa
 
 | Topic | Type | Description |
 |---|---|---|
-| *(odom_topic)* | `nav_msgs/Odometry` | Input odometry messages |
+| `odom` | `nav_msgs/Odometry` | Input odometry messages (remap to the desired topic) |
 
 **Publications**
 
@@ -63,7 +62,6 @@ twist is derived by finite-differencing consecutive poses, with covariance propa
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `odom_topic` | string | *required* | Odometry topic to subscribe to |
 | `frame_id` | string | `""` | Override the output header frame_id; uses the odometry frame if empty |
 | `differential` | bool | `false` | Derive twist by differencing consecutive poses rather than reading the twist field directly |
 
@@ -88,7 +86,7 @@ main TF tree.
 
 | Topic | Type | Description |
 |---|---|---|
-| *(odom_topic)* | `nav_msgs/Odometry` | Input odometry messages |
+| `odom` | `nav_msgs/Odometry` | Input odometry messages (remap to the desired topic) |
 
 **Publications**
 
@@ -100,7 +98,6 @@ main TF tree.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `odom_topic` | string | *required* | Odometry topic to subscribe to |
 | `child_frame` | string | *required* | Frame to broadcast as a child of `parent_frame`; must appear in the odometry message |
 | `parent_frame` | string | *required* | Frame that will become the parent of `child_frame` in the main TF tree |
 | `timestamp_offset` | double | `0.0` | Seconds added to the message timestamp before broadcasting; a positive value future-dates the transform to keep it valid between low-frequency updates |
@@ -132,7 +129,7 @@ requirement is that `child_frame` must not already have a parent in the main TF 
 
 | Topic | Type | Description |
 |---|---|---|
-| *(source_tf_topic)* | `tf2_msgs/TFMessage` | Source TF transforms, kept separate from the main tree |
+| `tf_source` | `tf2_msgs/TFMessage` | Source TF transforms, kept separate from the main tree (remap to the desired topic) |
 | `/tf` | `tf2_msgs/TFMessage` | Main TF tree (via TransformListener) |
 | `/tf_static` | `tf2_msgs/TFMessage` | Static transforms (via TransformListener) |
 
@@ -148,4 +145,3 @@ requirement is that `child_frame` must not already have a parent in the main TF 
 |---|---|---|---|
 | `child_frame` | string | *required* | Frame to broadcast as a child of `parent_frame` |
 | `parent_frame` | string | *required* | Frame that will become the parent of `child_frame` in the main TF tree |
-| `source_tf_topic` | string | *required* | TF topic carrying the source transforms |
