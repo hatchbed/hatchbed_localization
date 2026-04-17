@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 project(hatchbed_localization)
 
 find_package(ament_cmake REQUIRED)
-find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(hatchbed_common REQUIRED)
