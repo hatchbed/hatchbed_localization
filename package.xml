@@ -10,8 +10,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>eigen3_cmake_module</depend>
-  <depend>Eigen3</depend>
+  <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>hatchbed_common</depend>
   <depend>nav_msgs</depend>
