@@ -13,10 +13,6 @@ find_package(tf2 REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 
-include_directories(
-  include
-)
-
 add_library(${PROJECT_NAME} SHARED
   src/covariance_util.cpp
   src/imu_to_twist.cpp
@@ -25,22 +21,23 @@ add_library(${PROJECT_NAME} SHARED
   src/reframe_odom.cpp
   src/tf_reroot.cpp
 )
-target_link_libraries(${PROJECT_NAME}
-  Eigen3::Eigen
-)
-
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
-
-ament_target_dependencies(${PROJECT_NAME}
-  geometry_msgs
-  hatchbed_common
-  nav_msgs
-  rclcpp
-  rclcpp_components
-  sensor_msgs
-  tf2
-  tf2_msgs
-  tf2_ros
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${hatchbed_common_INCLUDE_DIRS}
+)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  Eigen3::Eigen
+  ${geometry_msgs_TARGETS}
+  hatchbed_common::hatchbed_common
+  ${nav_msgs_TARGETS}
+  rclcpp::rclcpp
+  ${rclcpp_components_TARGETS}
+  ${sensor_msgs_TARGETS}
+  tf2::tf2
+  ${tf2_msgs_TARGETS}
+  tf2_ros::tf2_ros
 )
 
 rclcpp_components_register_node(${PROJECT_NAME}
@@ -75,6 +72,7 @@ install(TARGETS
   odom_to_twist
   reframe_odom
   tf_reroot
+  EXPORT ${PROJECT_NAME}Targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
@@ -82,6 +80,20 @@ install(TARGETS
 
 install(DIRECTORY include/
   DESTINATION include/
+)
+
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+  Eigen3
+  geometry_msgs
+  hatchbed_common
+  nav_msgs
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  tf2
+  tf2_msgs
+  tf2_ros
 )
 
 if(BUILD_TESTING)
@@ -96,9 +108,7 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_covariance_util
       test/test_covariance_util.cpp)
-
-  target_link_libraries(test_covariance_util
-      ${PROJECT_NAME})
+  target_link_libraries(test_covariance_util ${PROJECT_NAME})
 endif()
 
 ament_package()
