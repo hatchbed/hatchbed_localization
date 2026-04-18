@@ -30,7 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   Eigen3::Eigen
   ${geometry_msgs_TARGETS}
-  hatchbed_common::hatchbed_common
+  ${hatchbed_common_TARGETS}
   ${nav_msgs_TARGETS}
   rclcpp::rclcpp
   ${rclcpp_components_TARGETS}
