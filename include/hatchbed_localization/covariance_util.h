@@ -30,7 +30,7 @@
 
 #include <array>
 
-#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Quaternion.hpp>
 
 namespace hatchbed_localization {
 
