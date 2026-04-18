@@ -29,7 +29,7 @@
 #include <gtest/gtest.h>
 #include <hatchbed_localization/covariance_util.h>
 #include <Eigen/Geometry>
-#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Quaternion.hpp>
 #include <array>
 #include <cmath>
 
